@@ -1,9 +1,34 @@
 package ru.netology.services;
-import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class MonthlyVacationsServiceTest {
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/testData.csv", numLinesToSkip = 1)
+    public void testCounter(int income, int expenses, int threshold, int expectedCounter) {
+        if (income < 0 || expenses < 0 || threshold < 0) {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                MonthlyVacationsService counter = new MonthlyVacationsService();
+                counter.monthlyVacationsCounter(income, expenses, threshold);
+            });
+            if (income < 0) {
+                assertEquals("Income cannot be negative", exception.getMessage());
+            } else if (expenses < 0) {
+                assertEquals("Expenses cannot be negative", exception.getMessage());
+            } else if (threshold < 0){
+                assertEquals("Threshold cannot be negative", exception.getMessage());
+            }
+        } else {
+            MonthlyVacationsService counter = new MonthlyVacationsService();
+            int result = counter.monthlyVacationsCounter(income, expenses, threshold);
+            assertEquals(expectedCounter, result);
+        }
+    }
 
     @Test
     void testCounterFirstDefaultValues() {
